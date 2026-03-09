@@ -1,0 +1,21 @@
+{
+  "name": "data-processing-cli",
+  "version": "1.0.0",
+  "description": "data-processing-cli-toolkit",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ulistonee/Data-Processing-CLI.git"
+  },
+  "author": "Ulistonee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Ulistonee/Data-Processing-CLI/issues"
+  },
+  "homepage": "https://github.com/Ulistonee/Data-Processing-CLI#readme",
+  "type": "module"
+}
