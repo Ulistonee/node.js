@@ -1,4 +1,6 @@
 import * as navigation from './navigation.js';
+import {csvToJson} from "./commands/csvToJson.js";
+import {jsonToCsv} from "./commands/jsonToCsv.js";
 
 export function createLineHandler({ rl, currentDirState }) {
   return async function handleLine(input) {
@@ -9,7 +11,7 @@ export function createLineHandler({ rl, currentDirState }) {
       return;
     }
 
-    if (trimmed === 'exit') {
+    if (trimmed === '.exit' || trimmed === 'exit') {
       rl.close();
       return;
     }
@@ -27,6 +29,12 @@ export function createLineHandler({ rl, currentDirState }) {
           break;
         case 'ls':
           await navigation.ls(args, currentDirState);
+          break;
+        case 'csv-to-json':
+          await csvToJson(args, currentDirState);
+          break;
+        case 'json-to-csv':
+          await jsonToCsv(args, currentDirState);
           break;
 
         default:

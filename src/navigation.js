@@ -27,17 +27,25 @@ export async function ls(args, state) {
       withFileTypes: true,
     });
 
-    const names = entries.map((e) => e.name);
-    console.log(names.sort((a, b) => a - b ).join('\n'));
+    const visible = entries.filter((e) => !e.name.startsWith('.'));
+
+    const folders = visible
+      .filter((e) => e.isDirectory())
+      .map((e) => e.name)
+      .sort((a, b) => a.localeCompare(b));
+
+    const files = visible
+      .filter((e) => !e.isDirectory())
+      .map((e) => e.name)
+      .sort((a, b) => a.localeCompare(b));
+
+    const lines = [
+      ...folders.map((name) => `${name.padEnd(90)}[folder]`),
+      ...files.map((name) => `${name.padEnd(90)}[file]`),
+    ];
+
+    console.log(lines.join('\n'));
   } catch {
     console.error('Operation failed');
-  }
-}
-
-export async function up(args, state) {
-  const parentDir = path.dirname(state.dir);
-
-  if (parentDir !== state.dir) {
-    state.dir = parentDir;
   }
 }
