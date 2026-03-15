@@ -4,6 +4,9 @@ import {jsonToCsv} from "./commands/jsonToCsv.js";
 import {count} from "./commands/count.js";
 import {hash} from "./commands/hash.js";
 import {hashCompare} from "./commands/hashCompare.js";
+import {encrypt} from "./commands/encrypt.js";
+import {decrypt} from "./commands/decrypt.js";
+import {logStats} from "./commands/logStats.js";
 
 export function createLineHandler({ rl, currentDirState }) {
   return async function handleLine(input) {
@@ -47,6 +50,15 @@ export function createLineHandler({ rl, currentDirState }) {
           break;
         case 'hash-compare':
           await hashCompare(args, currentDirState);
+          break;
+        case 'encrypt':
+          await encrypt(args, currentDirState);
+          break;
+        case 'decrypt':
+          await decrypt(args, currentDirState);
+          break;
+        case 'log-stats':
+          await logStats(args, currentDirState);
           break;
 
         default:

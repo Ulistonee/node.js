@@ -1,0 +1,53 @@
+{
+  "total": 500000,
+  "levels": {
+    "INFO": 166833,
+    "WARN": 166988,
+    "ERROR": 166179
+  },
+  "status": {
+    "2xx": 166833,
+    "3xx": 0,
+    "4xx": 166988,
+    "5xx": 166179
+  },
+  "topPaths": [
+    {
+      "path": "/api/users/:id",
+      "count": 55779
+    },
+    {
+      "path": "/api/orders/:id",
+      "count": 55724
+    },
+    {
+      "path": "/api/logout",
+      "count": 55687
+    },
+    {
+      "path": "/api/users",
+      "count": 55605
+    },
+    {
+      "path": "/api/health",
+      "count": 55546
+    },
+    {
+      "path": "/api/search",
+      "count": 55481
+    },
+    {
+      "path": "/api/orders",
+      "count": 55464
+    },
+    {
+      "path": "/api/payments",
+      "count": 55431
+    },
+    {
+      "path": "/api/login",
+      "count": 55283
+    }
+  ],
+  "avgResponseTimeMs": 1003.52
+}
