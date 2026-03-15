@@ -8,8 +8,7 @@ export async function count(args, state) {
   const { input } = parseArgs(args, ['input'])
 
   if (!input) {
-    console.error('Invalid input')
-    return
+    throw new Error('Invalid input')
   }
 
   const inputPath = path.resolve(state.dir, input)

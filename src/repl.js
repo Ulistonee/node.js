@@ -75,7 +75,7 @@ export function createLineHandler({ rl, currentDirState }) {
           console.error('Invalid input');
       }
     } catch (err) {
-      console.error(err);
+      console.log(err.message);
     }
 
     if (success) {
