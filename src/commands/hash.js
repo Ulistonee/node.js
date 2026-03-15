@@ -2,11 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
-const SUPPORTED_ALGORITHMS = ['sha256', 'md5', 'sha512']
+export const SUPPORTED_ALGORITHMS = ['sha256', 'md5', 'sha512']
 
-function parseArgs(args) {
-  const result = { input: null, algorithm: 'sha256', save: false }
-
+export function parseArgs(args) {
+  const result = { input: null, algorithm: 'sha256', save: false, hashFile: null }
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--input') {
       result.input = args[++i]
@@ -15,12 +14,15 @@ function parseArgs(args) {
     } else if (args[i] === '--save') {
       result.save = true
     }
+    else if (args[i] === '--hash') {
+      result.hashFile = args[++i]
+    }
   }
 
   return result
 }
 
-function calculateHash(filePath, algorithm, currentDir) {
+export function calculateHash(filePath, algorithm, currentDir) {
   return new Promise((resolve, reject) => {
     const absolutePath = path.resolve(currentDir, filePath)
 

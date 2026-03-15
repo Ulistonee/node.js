@@ -3,6 +3,7 @@ import {csvToJson} from "./commands/csvToJson.js";
 import {jsonToCsv} from "./commands/jsonToCsv.js";
 import {count} from "./commands/count.js";
 import {hash} from "./commands/hash.js";
+import {hashCompare} from "./commands/hashCompare.js";
 
 export function createLineHandler({ rl, currentDirState }) {
   return async function handleLine(input) {
@@ -43,6 +44,9 @@ export function createLineHandler({ rl, currentDirState }) {
           break;
         case 'hash':
           await hash(args, currentDirState);
+          break;
+        case 'hash-compare':
+          await hashCompare(args, currentDirState);
           break;
 
         default:
