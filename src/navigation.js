@@ -1,6 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 
+export async function up(args, state) {
+  const parentDir = path.dirname(state.dir);
+
+  if (parentDir !== state.dir) {
+    state.dir = parentDir;
+  }
+}
+
 export async function cd(args, state) {
   if (args.length === 0) {
     console.error('Invalid input');

@@ -2,6 +2,7 @@ import * as navigation from './navigation.js';
 import {csvToJson} from "./commands/csvToJson.js";
 import {jsonToCsv} from "./commands/jsonToCsv.js";
 import {count} from "./commands/count.js";
+import {hash} from "./commands/hash.js";
 
 export function createLineHandler({ rl, currentDirState }) {
   return async function handleLine(input) {
@@ -39,6 +40,9 @@ export function createLineHandler({ rl, currentDirState }) {
           break;
         case 'count':
           await count(args, currentDirState);
+          break;
+        case 'hash':
+          await hash(args, currentDirState);
           break;
 
         default:
