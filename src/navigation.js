@@ -19,13 +19,12 @@ export async function cd(args, state) {
   try {
     const stat = await fs.promises.stat(targetPath);
     if (!stat.isDirectory()) {
-      console.error('Operation failed');
-      return;
+      throw new Error('Operation failed');
     }
 
     state.dir = targetPath;
   } catch (err) {
-    console.error('Operation failed');
+    throw new Error('Operation failed');
   }
 }
 
@@ -54,6 +53,6 @@ export async function ls(state) {
 
     console.log(lines.join('\n'));
   } catch {
-    console.error('Operation failed');
+    throw new Error('Operation failed');
   }
 }
