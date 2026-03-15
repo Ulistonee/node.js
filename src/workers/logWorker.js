@@ -1,4 +1,6 @@
-import {parseArgs} from "../utils/argParser.js";
+import { parentPort, workerData } from 'worker_threads'
+import fs from 'fs'
+
 
 export function runWorker() {
   const { filePath, start, end } = workerData
