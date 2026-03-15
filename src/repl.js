@@ -27,14 +27,14 @@ export function createLineHandler({ rl, currentDirState }) {
     try {
       switch (command) {
         case 'up':
-          await navigation.up(args, currentDirState);
+          await navigation.up(currentDirState);
           break;
 
         case 'cd':
           await navigation.cd(args, currentDirState);
           break;
         case 'ls':
-          await navigation.ls(args, currentDirState);
+          await navigation.ls(currentDirState);
           break;
         case 'csv-to-json':
           await csvToJson(args, currentDirState);

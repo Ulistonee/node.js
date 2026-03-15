@@ -1,35 +1,44 @@
 import fs from 'fs';
 import path from 'path';
-import {calculateHash, parseArgs, SUPPORTED_ALGORITHMS} from "./hash.js";
+import {calculateHash, SUPPORTED_ALGORITHMS} from "./hash.js";
+import {parseArgs} from "../utils/argParser.js";
 
 export async function hashCompare(args, state) {
-  const { input, hashFile, algorithm } = parseArgs(args)
+  const { input, hash: hashFile, algorithm } = parseArgs(
+    args,
+    ['input', 'hash', 'algorithm']
+  )
+
+  const algo = algorithm ?? 'sha256'
 
   if (!input || !hashFile) {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
-  if (!SUPPORTED_ALGORITHMS.includes(algorithm)) {
+  if (!SUPPORTED_ALGORITHMS.includes(algo)) {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   let hashValue
   try {
-    hashValue = await calculateHash(input, algorithm, state.dir)
+    hashValue = await calculateHash(input, algo, state.dir)
   } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const hashFilePath = path.resolve(state.dir, hashFile)
-  if (!fs.existsSync(hashFilePath)) {
+
+  try {
+    await fs.promises.access(hashFilePath)
+  } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
-  const expectedRaw = fs.readFileSync(hashFilePath, 'utf8').trim()
+  const expectedRaw = (await fs.promises.readFile(hashFilePath, 'utf8')).trim()
   const expected = expectedRaw.includes(':')
     ? expectedRaw.split(':')[1].trim()
     : expectedRaw

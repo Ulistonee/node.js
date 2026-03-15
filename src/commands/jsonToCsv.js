@@ -1,23 +1,23 @@
 import path from 'path';
 import fs from 'fs';
 import { Readable, pipeline } from 'stream';
+import {parseArgs} from "../utils/argParser.js";
 
 export async function jsonToCsv(args, state) {
-  const inputFlag = args.indexOf('--input');
-  const outputFlag = args.indexOf('--output');
+  const { input: inputFile, output: outputFile } = parseArgs(args)
 
-  if (inputFlag === -1 || outputFlag === -1) {
-    console.error('Operation failed');
-    return;
+  if (!inputFile || !outputFile) {
+    console.log('Operation failed')
+    return
   }
 
-  const inputPath = path.resolve(state.dir, args[inputFlag + 1]);
-  const outputPath = path.resolve(state.dir, args[outputFlag + 1]);
+  const inputPath = path.resolve(state.dir, inputFile);
+  const outputPath = path.resolve(state.dir, outputFile);
 
   try {
     await fs.promises.access(inputPath);
   } catch {
-    console.error('Operation failed');
+    console.log('Operation failed');
     return;
   }
 
@@ -26,7 +26,7 @@ export async function jsonToCsv(args, state) {
     const data = JSON.parse(content);
 
     if (!Array.isArray(data) || data.length === 0) {
-      console.error('Operation failed');
+      console.log('Operation failed');
       return;
     }
 
@@ -46,6 +46,6 @@ export async function jsonToCsv(args, state) {
       });
     });
   } catch {
-    console.error('Operation failed');
+    console.log('Operation failed');
   }
 }

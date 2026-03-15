@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 import { Worker, isMainThread, parentPort, workerData } from 'worker_threads'
+import {parseArgs} from "../utils/argParser.js";
 
 function runWorker() {
   const { filePath, start, end } = workerData
@@ -64,11 +65,11 @@ function parseLine(line, stats) {
   stats.responseTimeSum += responseTime
 }
 
-function findChunkBoundaries(filePath, numChunks) {
-  const fileSize = fs.statSync(filePath).size
+async function findChunkBoundaries(filePath, numChunks) {
+  const { size: fileSize } = await fs.promises.stat(filePath)
   const chunkSize = Math.floor(fileSize / numChunks)
   const boundaries = []
-  const fd = fs.openSync(filePath, 'r')
+  const fh = await fs.promises.open(filePath, 'r')
   const buf = Buffer.alloc(1)
 
   let start = 0
@@ -79,7 +80,7 @@ function findChunkBoundaries(filePath, numChunks) {
     if (!isLast) {
       let pos = end
       while (pos < fileSize - 1) {
-        fs.readSync(fd, buf, 0, 1, pos)
+        await fh.read(buf, 0, 1, pos)
         if (buf[0] === 0x0a) break
         pos++
       }
@@ -90,7 +91,7 @@ function findChunkBoundaries(filePath, numChunks) {
     start = end + 1
   }
 
-  fs.closeSync(fd)
+  await fh.close()
   return boundaries
 }
 
@@ -121,38 +122,26 @@ function mergeStats(partials) {
   return merged
 }
 
-function parseArgs(args) {
-  const result = { input: null, output: null }
-
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--input') {
-      result.input = args[++i]
-    } else if (args[i] === '--output') {
-      result.output = args[++i]
-    }
-  }
-
-  return result
-}
-
 export async function logStats(args, state) {
   const { input, output } = parseArgs(args)
 
   if (!input || !output) {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const inputPath  = path.resolve(state.dir, input)
   const outputPath = path.resolve(state.dir, output)
 
-  if (!fs.existsSync(inputPath)) {
+  try {
+    await fs.promises.access(inputPath)
+  } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const numCores   = os.cpus().length
-  const boundaries = findChunkBoundaries(inputPath, numCores)
+  const boundaries = await findChunkBoundaries(inputPath, numCores)
 
   const partials = await Promise.all(
     boundaries.map(({ start, end }) =>
@@ -187,7 +176,7 @@ export async function logStats(args, state) {
         : 0,
   }
 
-  fs.writeFileSync(outputPath, JSON.stringify(result, null, 2))
+  await fs.promises.writeFile(outputPath, JSON.stringify(result, null, 2))
   console.log('OK')
 }
 

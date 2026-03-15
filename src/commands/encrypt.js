@@ -1,16 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
-
-export function parseArgsForEncrypt(args) {
-  const result = { input: null, output: null, password: null }
-  for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--input')    result.input    = args[++i]
-    else if (args[i] === '--output')   result.output   = args[++i]
-    else if (args[i] === '--password') result.password = args[++i]
-  }
-  return result
-}
+import {parseArgs} from "../utils/argParser.js";
 
 export function deriveKey(password, salt) {
   return new Promise((resolve, reject) => {
@@ -22,19 +13,24 @@ export function deriveKey(password, salt) {
 }
 
 export async function encrypt(args, state) {
-  const { input, output, password } = parseArgs(args)
+  const { input, output, password } = parseArgs(
+    args,
+    ['input', 'output', 'password']
+  )
 
   if (!input || !output || !password) {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const inputPath  = path.resolve(state.dir, input)
   const outputPath = path.resolve(state.dir, output)
 
-  if (!fs.existsSync(inputPath)) {
+  try {
+    await fs.promises.access(inputPath)
+  } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const salt = crypto.randomBytes(16)
@@ -45,7 +41,7 @@ export async function encrypt(args, state) {
     key = await deriveKey(password, salt)
   } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const cipher     = crypto.createCipheriv('aes-256-gcm', key, iv)
@@ -72,7 +68,7 @@ export async function encrypt(args, state) {
     writeStream.on('finish', resolve)
   }).catch(() => {
     console.log('Operation failed')
-    process.exit(1)
+    return
   })
 
   console.log('OK')

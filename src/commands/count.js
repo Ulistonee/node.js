@@ -2,16 +2,17 @@ import path from 'path';
 import fs from 'fs';
 import { Transform, pipeline } from 'stream';
 import { Writable } from 'stream';
+import { parseArgs } from '../utils/argParser.js';
 
 export async function count(args, state) {
-  const inputFlag = args.indexOf('--input');
+  const { input } = parseArgs(args, ['input'])
 
-  if (inputFlag === -1) {
-    console.error('Operation failed');
-    return;
+  if (!input) {
+    console.error('Operation failed')
+    return
   }
 
-  const inputPath = path.resolve(state.dir, args[inputFlag + 1]);
+  const inputPath = path.resolve(state.dir, input)
 
   try {
     await fs.promises.access(inputPath);
@@ -67,6 +68,6 @@ export async function count(args, state) {
       if (err) reject(err);
     });
   }).catch(() => {
-    console.error('Operation failed');
+    console.log('Operation failed');
   });
 }

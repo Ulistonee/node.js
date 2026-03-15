@@ -1,18 +1,15 @@
 import path from 'path';
 import fs from 'fs';
 import { Transform, pipeline } from 'stream';
+import { parseArgs } from '../utils/argParser.js';
 
 export async function csvToJson(args, state) {
-  const inputFlag = args.indexOf('--input');
-  const outputFlag = args.indexOf('--output');
+  const { input: inputFile, output: outputFile } = parseArgs(args)
 
-  if (inputFlag === -1 || outputFlag === -1) {
-    console.error('Operation failed');
-    return;
+  if (!inputFile || !outputFile) {
+    console.error('Operation failed')
+    return
   }
-
-  const inputFile = args[inputFlag + 1];
-  const outputFile = args[outputFlag + 1];
 
   const inputPath = path.resolve(state.dir, inputFile);
   const outputPath = path.resolve(state.dir, outputFile);
@@ -76,6 +73,6 @@ export async function csvToJson(args, state) {
       else resolve();
     });
   }).catch(() => {
-    console.error('Operation failed');
+    console.log('Operation failed');
   });
 }

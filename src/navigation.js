@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export async function up(args, state) {
+export async function up(state) {
   const parentDir = path.dirname(state.dir);
 
   if (parentDir !== state.dir) {
@@ -26,10 +26,11 @@ export async function cd(args, state) {
     state.dir = targetPath;
   } catch (err) {
     console.error('Operation failed');
+    return
   }
 }
 
-export async function ls(args, state) {
+export async function ls(state) {
   try {
     const entries = await fs.promises.readdir(state.dir, {
       withFileTypes: true,
@@ -55,5 +56,6 @@ export async function ls(args, state) {
     console.log(lines.join('\n'));
   } catch {
     console.error('Operation failed');
+    return
   }
 }

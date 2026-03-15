@@ -1,32 +1,38 @@
-import {deriveKey, parseArgsForEncrypt} from "./encrypt.js";
+import { deriveKey } from "./encrypt.js";
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
+import { parseArgs } from "../utils/argParser.js";
 
 export async function decrypt(args, state) {
-  const { input, output, password } = parseArgsForEncrypt(args)
+  const { input, output, password } = parseArgs(
+    args,
+    ['input', 'output', 'password']
+  )
 
   if (!input || !output || !password) {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const inputPath  = path.resolve(state.dir, input)
   const outputPath = path.resolve(state.dir, output)
 
-  if (!fs.existsSync(inputPath)) {
+  try {
+    await fs.promises.access(inputPath)
+  } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
-  const fd = fs.openSync(inputPath, 'r')
+  const fh = await fs.promises.open(inputPath, 'r')
   const header = Buffer.alloc(28)
-  fs.readSync(fd, header, 0, 28, 0)
+  await fh.read(header, 0, 28, 0)
 
-  const fileSize = fs.fstatSync(fd).size
+  const { size: fileSize } = await fh.stat()
   const authTag = Buffer.alloc(16)
-  fs.readSync(fd, authTag, 0, 16, fileSize - 16)
-  fs.closeSync(fd)
+  await fh.read(authTag, 0, 16, fileSize - 16)
+  await fh.close()
 
   const salt = header.subarray(0, 16)
   const iv   = header.subarray(16, 28)
@@ -36,7 +42,7 @@ export async function decrypt(args, state) {
     key = await deriveKey(password, salt)
   } catch {
     console.log('Operation failed')
-    process.exit(1)
+    return
   }
 
   const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv)
@@ -53,10 +59,9 @@ export async function decrypt(args, state) {
     readStream.pipe(decipher).pipe(writeStream)
 
     writeStream.on('finish', resolve)
-  }).catch(() => {
-    try { fs.unlinkSync(outputPath) } catch {}
+  }).catch(async () => {
+    try { await fs.promises.unlink(outputPath) } catch {}
     console.log('Operation failed')
-    process.exit(1)
   })
 
   console.log('OK')
