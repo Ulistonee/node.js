@@ -11,8 +11,7 @@ export async function decrypt(args, state) {
   )
 
   if (!input || !output || !password) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const inputPath  = path.resolve(state.dir, input)
@@ -21,8 +20,7 @@ export async function decrypt(args, state) {
   try {
     await fs.promises.access(inputPath)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const fh = await fs.promises.open(inputPath, 'r')
@@ -41,8 +39,7 @@ export async function decrypt(args, state) {
   try {
     key = await deriveKey(password, salt)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv)
@@ -60,8 +57,7 @@ export async function decrypt(args, state) {
 
     writeStream.on('finish', resolve)
   }).catch(async () => {
-    try { await fs.promises.unlink(outputPath) } catch {}
-    console.log('Operation failed')
+    try { await fs.promises.unlink(outputPath) } catch {throw new Error('Operation failed')}
   })
 
   console.log('OK')

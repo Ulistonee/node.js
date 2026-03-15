@@ -8,7 +8,7 @@ export async function count(args, state) {
   const { input } = parseArgs(args, ['input'])
 
   if (!input) {
-    console.error('Operation failed')
+    console.error('Invalid input')
     return
   }
 
@@ -17,8 +17,7 @@ export async function count(args, state) {
   try {
     await fs.promises.access(inputPath);
   } catch {
-    console.error('Operation failed');
-    return;
+    throw new Error('Operation failed')
   }
 
   await new Promise((resolve, reject) => {
@@ -68,6 +67,6 @@ export async function count(args, state) {
       if (err) reject(err);
     });
   }).catch(() => {
-    console.log('Operation failed');
+    throw new Error('Operation failed')
   });
 }

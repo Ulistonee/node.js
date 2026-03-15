@@ -7,8 +7,7 @@ export async function jsonToCsv(args, state) {
   const { input: inputFile, output: outputFile } = parseArgs(args)
 
   if (!inputFile || !outputFile) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const inputPath = path.resolve(state.dir, inputFile);
@@ -17,8 +16,7 @@ export async function jsonToCsv(args, state) {
   try {
     await fs.promises.access(inputPath);
   } catch {
-    console.log('Operation failed');
-    return;
+    throw new Error('Operation failed')
   }
 
   try {
@@ -26,8 +24,7 @@ export async function jsonToCsv(args, state) {
     const data = JSON.parse(content);
 
     if (!Array.isArray(data) || data.length === 0) {
-      console.log('Operation failed');
-      return;
+      throw new Error('Operation failed')
     }
 
     const headers = Object.keys(data[0]);
@@ -46,6 +43,6 @@ export async function jsonToCsv(args, state) {
       });
     });
   } catch {
-    console.log('Operation failed');
+    throw new Error('Operation failed')
   }
 }

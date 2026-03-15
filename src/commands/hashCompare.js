@@ -12,21 +12,18 @@ export async function hashCompare(args, state) {
   const algo = algorithm ?? 'sha256'
 
   if (!input || !hashFile) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   if (!SUPPORTED_ALGORITHMS.includes(algo)) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   let hashValue
   try {
     hashValue = await calculateHash(input, algo, state.dir)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const hashFilePath = path.resolve(state.dir, hashFile)
@@ -34,8 +31,7 @@ export async function hashCompare(args, state) {
   try {
     await fs.promises.access(hashFilePath)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const expectedRaw = (await fs.promises.readFile(hashFilePath, 'utf8')).trim()

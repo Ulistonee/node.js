@@ -19,8 +19,7 @@ export async function encrypt(args, state) {
   )
 
   if (!input || !output || !password) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const inputPath  = path.resolve(state.dir, input)
@@ -29,8 +28,7 @@ export async function encrypt(args, state) {
   try {
     await fs.promises.access(inputPath)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const salt = crypto.randomBytes(16)
@@ -40,8 +38,7 @@ export async function encrypt(args, state) {
   try {
     key = await deriveKey(password, salt)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const cipher     = crypto.createCipheriv('aes-256-gcm', key, iv)
@@ -67,8 +64,7 @@ export async function encrypt(args, state) {
     cipher.on('error', reject)
     writeStream.on('finish', resolve)
   }).catch(() => {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   })
 
   console.log('OK')

@@ -11,7 +11,7 @@ export async function calculateHash(filePath, algorithm, currentDir) {
   try {
     await fs.promises.access(absolutePath)
   } catch {
-    throw new Error('FILE_NOT_FOUND')
+    throw new Error('Operation failed')
   }
 
   return new Promise((resolve, reject) => {
@@ -34,21 +34,18 @@ export async function hash(args, state) {
   const algo = algorithm ?? 'sha256'
 
   if (!input) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   if (!SUPPORTED_ALGORITHMS.includes(algo)) {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   let hashValue
   try {
     hashValue = await calculateHash(input, algo, state.dir)
   } catch {
-    console.log('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   console.log(`${algo}: ${hashValue}`)
@@ -59,7 +56,7 @@ export async function hash(args, state) {
     try {
       await fs.promises.writeFile(savePath, `${algo}: ${hashValue}\n`)
     } catch {
-      console.log('Operation failed')
+      throw new Error('Operation failed')
     }
   }
 }

@@ -7,8 +7,7 @@ export async function csvToJson(args, state) {
   const { input: inputFile, output: outputFile } = parseArgs(args)
 
   if (!inputFile || !outputFile) {
-    console.error('Operation failed')
-    return
+    throw new Error('Operation failed')
   }
 
   const inputPath = path.resolve(state.dir, inputFile);
@@ -17,8 +16,7 @@ export async function csvToJson(args, state) {
   try {
     await fs.promises.access(inputPath);
   } catch {
-    console.error('Operation failed');
-    return;
+    throw new Error('Operation failed')
   }
 
   await new Promise((resolve, reject) => {
@@ -73,6 +71,6 @@ export async function csvToJson(args, state) {
       else resolve();
     });
   }).catch(() => {
-    console.log('Operation failed');
+    throw new Error('Operation failed')
   });
 }

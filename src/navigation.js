@@ -19,14 +19,13 @@ export async function cd(args, state) {
   try {
     const stat = await fs.promises.stat(targetPath);
     if (!stat.isDirectory()) {
-      console.error('Invalid input');
+      console.error('Operation failed');
       return;
     }
 
     state.dir = targetPath;
   } catch (err) {
     console.error('Operation failed');
-    return
   }
 }
 
@@ -56,6 +55,5 @@ export async function ls(state) {
     console.log(lines.join('\n'));
   } catch {
     console.error('Operation failed');
-    return
   }
 }
