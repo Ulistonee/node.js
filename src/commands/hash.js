@@ -34,11 +34,11 @@ export async function hash(args, state) {
   const algo = algorithm ?? 'sha256'
 
   if (!input) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   if (!SUPPORTED_ALGORITHMS.includes(algo)) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   let hashValue

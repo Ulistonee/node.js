@@ -12,11 +12,11 @@ export async function hashCompare(args, state) {
   const algo = algorithm ?? 'sha256'
 
   if (!input || !hashFile) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   if (!SUPPORTED_ALGORITHMS.includes(algo)) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   let hashValue

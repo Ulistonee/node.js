@@ -19,7 +19,7 @@ export async function encrypt(args, state) {
   )
 
   if (!input || !output || !password) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   const inputPath  = path.resolve(state.dir, input)

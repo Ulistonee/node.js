@@ -66,7 +66,7 @@ export async function logStats(args, state) {
   const { input, output } = parseArgs(args)
 
   if (!input || !output) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   const inputPath  = path.resolve(state.dir, input)

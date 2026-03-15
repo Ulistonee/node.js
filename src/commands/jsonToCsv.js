@@ -7,7 +7,7 @@ export async function jsonToCsv(args, state) {
   const { input: inputFile, output: outputFile } = parseArgs(args)
 
   if (!inputFile || !outputFile) {
-    throw new Error('Operation failed')
+    throw new Error('Invalid input')
   }
 
   const inputPath = path.resolve(state.dir, inputFile);
