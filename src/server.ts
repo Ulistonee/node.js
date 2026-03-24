@@ -1,0 +1,51 @@
+import { WebSocketServer } from 'ws';
+import 'dotenv/config';
+import { handleRegistration } from './commands/handleRegistration.js';
+import { handleLogin } from './commands/handleLogin.js';
+import { handleCreateGame } from './commands/handleCreateGame.js';
+
+const serverHandler = (ws: WebSocket) => {
+  console.log('Client connected');
+      
+  ws.on('message', (rawData) => {
+    let msg;
+
+    try {
+      msg = JSON.parse(rawData);
+    } catch (err) {
+      ws.send(JSON.stringify({ id: 0, error: 'Invalid JSON' }));
+      return;
+    }
+
+    if (msg.id !== 0) {
+      ws.send(JSON.stringify({ id: 0, error: 'Invalid ID' }));
+      return;
+    }
+
+    switch (msg.type) {
+      case 'reg':
+        handleRegistration(ws, msg.data);
+        break;
+      case 'login':
+        handleLogin(ws, msg.data);
+        break;
+      case 'create_game':
+        handleCreateGame(ws, msg.data);
+        break;
+      default:
+        ws.send(JSON.stringify({ id: 0, error: 'Unknown command' }));
+    }
+  });
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+  });
+}
+
+export const startServer = () => {
+    const wss = new WebSocketServer({ port: Number(process.env.PORT) });
+
+    wss.on('connection', serverHandler);
+      
+    console.log(`WebSocket server running on ws://localhost:${process.env.PORT}`);
+}
