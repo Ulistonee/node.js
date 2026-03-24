@@ -26,9 +26,6 @@ const serverHandler = (ws: WebSocket) => {
       case 'reg':
         handleRegistration(ws, msg.data);
         break;
-      case 'login':
-        handleLogin(ws, msg.data);
-        break;
       case 'create_game':
         handleCreateGame(ws, msg.data);
         break;

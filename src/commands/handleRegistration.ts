@@ -1,4 +1,5 @@
 import { players } from "../store/store.js";
+import { users } from "../store/store.js";
 
 export const handleRegistration = (ws: WebSocket, msg: any) => {
     const { name, password } = msg;
@@ -8,24 +9,33 @@ export const handleRegistration = (ws: WebSocket, msg: any) => {
         return;
     }
 
-    if (players.has(name)) {
-        ws.send(JSON.stringify({ id: 0, error: 'User already exists' }));
-        return;
-    }
+    if (users.has(name)) {
+        const user = users.get(name);
 
-    players.set(name, {
-        name: name,
-        index: players.size + 1,
-        password: password,
-        score: 0
-    });
+        if (user?.password !== password) {
+            ws.send(JSON.stringify({ id: 0, error: 'Invalid password' }));
+            return;
+        }
+        players.set(name, {
+            name: name,
+            index: user?.index ?? users.size + 1,
+            score: 0,
+        });
+    }
+    else {
+        users.set(name, {
+            name: name,
+            index: users.size + 1,
+            password: password,
+        });
+    }
 
     ws.send(JSON.stringify(
     { 
         type: "reg",
         data: {
             name: name,
-            index: players.size,
+            index: users.size,
             error: false,
             errorText: ""
         },

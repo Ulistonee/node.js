@@ -1,4 +1,4 @@
-import { games } from "../store/store.js";
+import { games, players } from "../store/store.js";
 import { v4 as uuid } from "uuid";
 
 export const handleCreateGame = (ws: WebSocket, msg: any) => {
@@ -11,8 +11,12 @@ export const handleCreateGame = (ws: WebSocket, msg: any) => {
 
     const game = {
         id: uuid(),
+        code: uuid().slice(0, 6),
+        hostId: players.get(ws.user.name)?.index,
         questions: questions,
-        code: uuid().slice(0, 6)
+        players: [],
+        currentQuestion: 0,
+        status: 'waiting'
     }
 
     games.set(game.id, game);
